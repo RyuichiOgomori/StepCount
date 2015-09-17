@@ -1,0 +1,54 @@
+﻿<!-- comment -->
+// comment
+/* comment */
+/* comment
+coment 
+*/*/
+<UserControl x:Class="Total.Controls.GeneralTextComboBox"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:be="clr-namespace:Total.Behaviors;assembly=Total.Behaviors"
+             mc:Ignorable="d" 
+             d:DesignHeight="30" d:DesignWidth="210">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBox x:Name="GeneralTextBox" Grid.Column="0" Margin="0,2.5,0,2.5"
+                 TextChanged="GeneralTextBox_TextChanged"
+                 PreviewKeyDown="GeneralTextBox_KeyDown"
+                 VerticalContentAlignment="Center"
+                 HorizontalContentAlignment="Right"
+                 InputMethod.PreferredImeState="Off"
+                 InputMethod.IsInputMethodSuspended="True" 
+                 GotFocus="OnGotFocus"
+                 LostFocus="OnLostFocus"
+                 be:EnterToTabBehavior.IsEnterToTab="True">
+            <TextBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="切り取り(_T)" Command="ApplicationCommands.Cut"/>
+                    <MenuItem Header="コピー(_C)" Command="ApplicationCommands.Copy"/>
+                    <MenuItem Header="貼り付け(_P)" Command="ApplicationCommands.Paste"/>
+                </ContextMenu>
+            </TextBox.ContextMenu>
+        </TextBox>
+        <ComboBox x:Name="GeneralComboBox"
+                  Grid.Column="1"
+                  Margin="0,2.5,0,2.5"
+                  SelectionChanged="GeneralComboBox_SelectionChanged" 
+                  VerticalContentAlignment="Center"
+                  GotFocus="OnGotFocus"
+                  LostFocus="OnLostFocus"
+                  Loaded="GeneralComboBox_Loaded"
+                  be:EnterToTabBehavior.IsEnterToTab="True">
+            <ComboBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <VirtualizingStackPanel VirtualizingStackPanel.IsVirtualizing="True" VirtualizingStackPanel.VirtualizationMode="Recycling"/>
+                </ItemsPanelTemplate>
+            </ComboBox.ItemsPanel>
+        </ComboBox>
+    </Grid>
+</UserControl>
