@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "jstr.h"
 
 /* macros */
 #define N 256
@@ -14,17 +13,25 @@ int main(int argc, char *argv[]) {
 	FILE *fp;
 	char *filename = argv[1];
 	char readline[N] = { '\0' };
+	char buf[4];
 	int comment_count = 0;
 	int all_count = 0;
 	int space_count = 0;
 
 	/* ファイルのオープン */
-	if ((fp = fopen_bomcut(filename, "r")) == NULL) {
+	if ((fp = fopen(filename, "r")) == NULL) {
 		fprintf(stderr, "%sのオープンに失敗しました.\n", filename);
 		exit(EXIT_FAILURE);
+	} else {
+		if (fread(buf, 1, 3, fp) == 3){
+			// BOMチェック
+			if (memcmp(buf, "\xef\xbb\xbf", 3) != 0){ 
+				rewind(fp);
+			}
+		}
 	}
 
-	/* ファイルの終端まで文字を読み取り表示する */
+	/* ファイルの終端まで文字を読み取る */
 	while (fgets(readline, N, fp) != NULL) {
 		all_count++;
 		if (IsStartCommentLine(readline) == 1){
