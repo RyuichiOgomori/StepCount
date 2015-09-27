@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
 	/* ファイルのオープン */
 	if ((fp = fopen(filename, "r")) == NULL) {
 		fprintf(stderr, "%sのオープンに失敗しました.\n", filename);
+		system("pause");
 		exit(EXIT_FAILURE);
 	} else {
 		if (fread(buf, 1, 3, fp) == 3){
@@ -54,13 +55,12 @@ int main(int argc, char *argv[]) {
 	printf("全体の行数は%d行でした。\n", all_count);
 	printf("コメント行の行数は%d行でした。\n", comment_count);
 	printf("ステップ数は全部で%d行でした。\n", (all_count - (comment_count + space_count)));
-
+	system("pause");
 	return 0;
 }
 
 /* コメント開始チェック */
 int IsStartCommentLine(char *line) {
-	char comment_pre[] = "//";
 	int i;
 
 	for (i = 0;line[i] != '\0'; i++) {
