@@ -5,32 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using StepCount.Commons;
-using StepCount.Models;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using System.IO;
+using System.Collections.ObjectModel;
+using StepCount.Models;
 
 namespace StepCount.ViewModels
 {
     class MainViewModel : ViewModelBase
     {
         #region property
-
-
-
-        private string selectedThemeName;
-        /// <summary>
-        /// 選択したThemeの名前を取得または設定する。
-        /// </summary>
-        public string SelectedThemeName {
-            get { return selectedThemeName; }
-            set {
-                if(selectedThemeName == value) return;
-                selectedThemeName = value;
-                RaisePropertyChanged("SelectedThemeName");
-            }
-        }
-
         private string directoryPath;
         /// <summary>
         /// ディレクトリのパスを取得または設定する。
@@ -66,6 +51,8 @@ namespace StepCount.ViewModels
             set {
                 if(targetPath == value) return;
                 targetPath = value;
+                if(!targetPath.Equals(DirectoryPath)) DirectoryPath = string.Empty;
+                if(!targetPath.Equals(FilePaths)) FilePaths = null;
                 RaisePropertyChanged("TargetPath");
             }
         }
@@ -176,6 +163,19 @@ namespace StepCount.ViewModels
                 RaisePropertyChanged("IsDeepDirectoryCount");
             }
         }
+
+        private ObservableCollection<ResultFile> result;
+        /// <summary>
+        /// カウントした結果を取得、または設定する。
+        /// </summary>
+        public ObservableCollection<ResultFile> Result {
+            get { return result; }
+            set {
+                if(result == value) return;
+                result = value;
+                RaisePropertyChanged("Result");
+            }
+        }
         #endregion
 
         #region Command
@@ -217,46 +217,64 @@ namespace StepCount.ViewModels
                 if(countCommand == null)
                     countCommand = new RelayCommand(() =>
                     {
+                        // 初期化
                         string line;
                         AllQuantity = 0;
                         SpaceQuantity = 0;
                         StepQuantity = 0;
                         CommentQuantity = 0;
+                        Result = null;
+                        Result = new ObservableCollection<ResultFile>();
                         string[] files;
 
-                        if(string.IsNullOrEmpty(DirectoryPath) && FilePaths == null) return;
+                        if(string.IsNullOrEmpty(DirectoryPath) && FilePaths == null && string.IsNullOrEmpty(TargetPath)) return;
 
                         if(TargetDiretory) {
+                            if(string.IsNullOrEmpty(DirectoryPath)) DirectoryPath = TargetPath;
                             if(string.IsNullOrEmpty(DirectoryPath)) return;
                             files = Directory.GetFiles(DirectoryPath,FileType);
                             if(IsDeepDirectoryCount)
                                 files = Directory.GetFiles(DirectoryPath, FileType, SearchOption.AllDirectories);
                         } else {
-                            if(FilePaths.Length == 0) return;
+                            if(FilePaths == null) FilePaths = TargetPath.Split(',');
                             files = FilePaths;
                         }
 
                         // カウント
                         foreach(string file in files) {
+                            // 初期化
+                            AllQuantity = 0;
+                            SpaceQuantity = 0;
+                            StepQuantity = 0;
+                            CommentQuantity = 0;
+
                             StreamReader sr = new StreamReader(file);
+
+                            if(sr == null) return;
 
                             while(sr.Peek() >= 0) {
                                 line = sr.ReadLine();
                                 AllQuantity++;
+                                // コメント開始行チェック
                                 if(LineCheck.IsStartCommentLine(line)) {
                                     CommentQuantity++;
+                                    // コメント終了行まで移動しながら空白行と全体行をカウント
                                     while(sr.Peek() >= 0 && !LineCheck.IsEndCommentLine(line)) {
                                         line = sr.ReadLine();
                                         CommentQuantity++;
                                         AllQuantity++;
                                         if(LineCheck.IsSpaceLine(line)) SpaceQuantity++;
                                     }
+                                    // コメント行チェック
                                 } else if(LineCheck.IsCommentLine(line)) {
                                     CommentQuantity++;
+                                    // 空白行チェック
                                 } else if(LineCheck.IsSpaceLine(line)) {
                                     SpaceQuantity++;
+                                    // バルク開始行チェック
                                 } else if(LineCheck.IsStartBulkLine(line) != -1) {
                                     StepQuantity += LineCheck.IsStartBulkLine(line);
+                                    // バルク終了行まで移動しながら空白行と全体行をカウント
                                     while(sr.Peek() >= 0 && !LineCheck.IsEndBulkLine(line)) {
                                         line = sr.ReadLine();
                                         AllQuantity++;
@@ -267,6 +285,9 @@ namespace StepCount.ViewModels
                                 }
                             }
                             sr.Close();
+                            // 1ファイル分のカウント情報をカウント結果に追加
+                            Result.Add(new ResultFile() {Path = file, Name = Path.GetFileName(file), Step = StepQuantity,
+                                Comment = CommentQuantity, Space = SpaceQuantity, All = AllQuantity });
                         }
                     });
                 return countCommand;

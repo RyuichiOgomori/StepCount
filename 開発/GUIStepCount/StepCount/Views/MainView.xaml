@@ -7,20 +7,21 @@
         xmlns:ViewModel="clr-namespace:StepCount.ViewModels"
         mc:Ignorable="d"
         Title="StepCount"
-        ResizeMode="CanMinimize"
-        Height="300"
-        Width="300">
+        Height="500"
+        Width="400">
     <Window.DataContext>
         <ViewModel:MainViewModel />
     </Window.DataContext>
 
-    <Grid>
+    <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="1" Margin="20">
+        <Grid Grid.Row="1"
+              Margin="20,5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
@@ -29,24 +30,22 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
 
-            <TextBox Width="200"
-                     Text="{Binding Path=TargetPath,UpdateSourceTrigger=PropertyChanged}"
-                     
-                     />
-            <Button Grid.Column="1"
-                    Width="40"
-                    Command="{Binding ReferenceCommand}"
-                    Content="参照"
-                    HorizontalAlignment="Left" />
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center">
+                <TextBox Width="200"
+                         Text="{Binding TargetPath,UpdateSourceTrigger=PropertyChanged}"
+                         Drop="FileDrop"
+                         PreviewDragOver="FilePreviewDragOver"/>
+                <Button Width="40"
+                        Command="{Binding ReferenceCommand}"
+                        Content="参照"
+                        HorizontalAlignment="Left" />
+            </StackPanel>
 
             <CheckBox Grid.Row="1"
                       Grid.Column="0"
-                      Grid.ColumnSpan="2"
+                      HorizontalAlignment="Center"
                       IsChecked="{Binding TargetDiretory, UpdateSourceTrigger=PropertyChanged}"
                       Content="ディレクトリを対象にしてカウント"
                       Foreground="#666666"
@@ -54,7 +53,7 @@
 
             <CheckBox Grid.Row="2"
                       Grid.Column="0"
-                      Grid.ColumnSpan="2"
+                      HorizontalAlignment="Center"
                       IsChecked="{Binding IsDeepDirectoryCount, UpdateSourceTrigger=PropertyChanged}"
                       Content="ディレクトリを再帰的にカウント"
                       Foreground="#666666"
@@ -63,7 +62,7 @@
             <StackPanel Orientation="Horizontal"
                         Grid.Row="3"
                         Grid.Column="0"
-                        Grid.ColumnSpan="2">
+                        HorizontalAlignment="Center">
                 <TextBlock Grid.Row="2"
                            Grid.Column="0"
                            Text="ファイル拡張子"
@@ -77,72 +76,93 @@
 
             <Button Grid.Column="0"
                     Grid.Row="4"
-                    Grid.ColumnSpan="2"
-                    HorizontalAlignment="Center"
+                    HorizontalAlignment="Stretch"
                     Width="80"
                     Command="{Binding CountCommand}"
                     Content="カウント"
-                    Margin="0,10" />
-
-            <Grid Grid.Row="5"
-                  Grid.Column="0"
-                  Grid.ColumnSpan="2"
-                  Margin="0,5">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-
-                <TextBlock Grid.Row="0"
-                           Grid.Column="0"
-                           Text="ステップ数:"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Right"
-                           Margin="5,0,0,0" />
-                <TextBlock Grid.Row="0"
-                           Grid.Column="1"
-                           Text="{Binding StepQuantity}"
-                           Margin="0,2.5" />
-
-                <TextBlock Grid.Row="1"
-                           Grid.Column="0"
-                           Text="コメント行数:"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Right"
-                           Margin="5,0,0,0" />
-                <TextBlock Grid.Row="1"
-                           Grid.Column="1"
-                           Text="{Binding CommentQuantity}"
-                           Margin="0,2.5" />
-
-                <TextBlock Grid.Row="2"
-                           Grid.Column="0"
-                           Text="空白行数:"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Right"
-                           Margin="5,0,0,0" />
-                <TextBlock Grid.Row="2"
-                           Grid.Column="1"
-                           Text="{Binding SpaceQuantity}"
-                           Margin="0,2.5" />
-
-                <TextBlock Grid.Row="3"
-                           Grid.Column="0"
-                           Text="全体行数:"
-                           VerticalAlignment="Center"
-                           HorizontalAlignment="Right"
-                           Margin="5,0,0,0" />
-                <TextBlock Grid.Row="3"
-                           Grid.Column="1"
-                           Text="{Binding AllQuantity}"
-                           Margin="0,2.5" />
-            </Grid>
+                    Margin="0,2" />
         </Grid>
-    </Grid>
+            <DataGrid Grid.Row="2"
+                      Grid.Column="0"
+                      Grid.ColumnSpan="2"
+                      ItemsSource="{Binding Result}"
+                      Margin="0,5"
+                      CanUserAddRows="False"
+                      AutoGenerateColumns="False"
+                      CanUserResizeRows="False"
+                      CanUserResizeColumns="False">
+                <DataGrid.Columns>
+
+                    <DataGridTemplateColumn Header="ファイル名"
+                                            Width="*"
+                                            SortMemberPath="Name">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                            <TextBlock Text="{Binding Name}"
+                                       HorizontalAlignment="Left"
+                                       VerticalAlignment="Center"
+                                       Margin="2,0,0,0"
+                                       ToolTip="{Binding Path}" />
+                        </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="ステップ数"
+                                            MinWidth="60"
+                                            SortMemberPath="Step">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                            <TextBlock Text="{Binding Step}"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,2,0"
+                                       ToolTip="{Binding Step}" />
+                        </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="コメント数"
+                                            MinWidth="60"
+                                            SortMemberPath="Comment">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                            <TextBlock Text="{Binding Comment}"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,2,0"
+                                       ToolTip="{Binding Comment}" />
+                        </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="空白行数"
+                                            MinWidth="60"
+                                            SortMemberPath="Space">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                            <TextBlock Text="{Binding Space}"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,2,0"
+                                       ToolTip="{Binding Space}" />
+                        </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
+                    <DataGridTemplateColumn Header="全体行数"
+                                            MinWidth="60"
+                                            SortMemberPath="All">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                            <TextBlock Text="{Binding All}"
+                                       HorizontalAlignment="Right"
+                                       VerticalAlignment="Center"
+                                       Margin="0,0,2,0"
+                                       ToolTip="{Binding All}" />
+                        </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Grid>
 </Window>

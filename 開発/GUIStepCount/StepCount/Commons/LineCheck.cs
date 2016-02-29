@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Configuration;
+using System.Collections.ObjectModel;
 
-namespace StepCount.Models
+namespace StepCount.Commons
 {
     class LineCheck
     {
-
         /* コメント開始チェック */
         public static bool IsStartCommentLine(string line) {
             var str = line.Trim();
