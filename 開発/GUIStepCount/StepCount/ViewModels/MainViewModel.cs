@@ -227,6 +227,8 @@ namespace StepCount.ViewModels
                         Result = new ObservableCollection<ResultFile>();
                         string[] files;
 
+                        LineCheck checker = new LineCheck();
+
                         if(string.IsNullOrEmpty(DirectoryPath) && FilePaths == null && string.IsNullOrEmpty(TargetPath)) return;
 
                         if(TargetDiretory) {
@@ -256,29 +258,29 @@ namespace StepCount.ViewModels
                                 line = sr.ReadLine();
                                 AllQuantity++;
                                 // コメント開始行チェック
-                                if(LineCheck.IsStartCommentLine(line)) {
+                                if(checker.IsStartCommentLine(line)) {
                                     CommentQuantity++;
                                     // コメント終了行まで移動しながら空白行と全体行をカウント
-                                    while(sr.Peek() >= 0 && !LineCheck.IsEndCommentLine(line)) {
+                                    while(sr.Peek() >= 0 && !checker.IsEndCommentLine(line)) {
                                         line = sr.ReadLine();
                                         CommentQuantity++;
                                         AllQuantity++;
-                                        if(LineCheck.IsSpaceLine(line)) SpaceQuantity++;
+                                        if(checker.IsSpaceLine(line)) SpaceQuantity++;
                                     }
                                     // コメント行チェック
-                                } else if(LineCheck.IsCommentLine(line)) {
+                                } else if(checker.IsCommentLine(line)) {
                                     CommentQuantity++;
                                     // 空白行チェック
-                                } else if(LineCheck.IsSpaceLine(line)) {
+                                } else if(checker.IsSpaceLine(line)) {
                                     SpaceQuantity++;
                                     // バルク開始行チェック
-                                } else if(LineCheck.IsStartBulkLine(line) != -1) {
-                                    StepQuantity += LineCheck.IsStartBulkLine(line);
+                                } else if(checker.IsStartBulkLine(line) != -1) {
+                                    StepQuantity += checker.IsStartBulkLine(line);
                                     // バルク終了行まで移動しながら空白行と全体行をカウント
-                                    while(sr.Peek() >= 0 && !LineCheck.IsEndBulkLine(line)) {
+                                    while(sr.Peek() >= 0 && !checker.IsEndBulkLine(line)) {
                                         line = sr.ReadLine();
                                         AllQuantity++;
-                                        if(LineCheck.IsSpaceLine(line)) SpaceQuantity++;
+                                        if(checker.IsSpaceLine(line)) SpaceQuantity++;
                                     }
                                 } else {
                                     StepQuantity++;

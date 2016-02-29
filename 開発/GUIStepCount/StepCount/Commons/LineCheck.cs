@@ -11,7 +11,7 @@ namespace StepCount.Commons
     class LineCheck
     {
         /* コメント開始チェック */
-        public static bool IsStartCommentLine(string line) {
+        public bool IsStartCommentLine(string line) {
             var str = line.Trim();
             if(string.IsNullOrEmpty(ConfigurationManager.AppSettings["CommentStart"])) return false;
             var CommentStartStrings = ConfigurationManager.AppSettings["CommentStart"].Split(',');
@@ -24,7 +24,7 @@ namespace StepCount.Commons
         }
 
         /* コメント終了チェック */
-        public static bool IsEndCommentLine(string line) {
+        public bool IsEndCommentLine(string line) {
             var str = line.Trim();
             if(string.IsNullOrEmpty(ConfigurationManager.AppSettings["CommentEnd"])) return false;
             var CommentEndStrings = ConfigurationManager.AppSettings["CommentEnd"].Split(',');
@@ -37,7 +37,7 @@ namespace StepCount.Commons
         }
 
         /* コメント行チェック */
-        public static bool IsCommentLine(string line) {
+        public bool IsCommentLine(string line) {
             var str = line.Trim();
             if(string.IsNullOrEmpty(ConfigurationManager.AppSettings["Comment"])) return false;
             var CommentStrings = ConfigurationManager.AppSettings["Comment"].Split(',');
@@ -50,7 +50,7 @@ namespace StepCount.Commons
         }
 
         /* バルク開始チェック */
-        public static int IsStartBulkLine(string line) {
+        public int IsStartBulkLine(string line) {
             var str = line.Trim();
             if(string.IsNullOrEmpty(ConfigurationManager.AppSettings["BulkStart"])) return -1;
             if(string.IsNullOrEmpty(ConfigurationManager.AppSettings["BulkQuantity"])) return -1;
@@ -68,7 +68,7 @@ namespace StepCount.Commons
         }
 
         /* バルク終了チェック */
-        public static bool IsEndBulkLine(string line) {
+        public bool IsEndBulkLine(string line) {
             var str = line.Trim();
             if(string.IsNullOrEmpty(ConfigurationManager.AppSettings["BulkEnd"])) return false;
             var BulkEndStrings = ConfigurationManager.AppSettings["BulkEnd"].Split(',');
@@ -81,7 +81,7 @@ namespace StepCount.Commons
         }
 
         /* 空白行チェック */
-        public static bool IsSpaceLine(string str) {
+        public bool IsSpaceLine(string str) {
             for(int i = 0; i < str.Length; i++) {
                 if(' ' != str[i] && '　' != str[i] && '\t' != str[i]) {
                     return false;
